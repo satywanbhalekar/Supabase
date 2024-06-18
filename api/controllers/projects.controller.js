@@ -1,6 +1,8 @@
 const projectsService = require('../services/projects.service');
 const { addProjectSchema, updateProjectSchema } = require('../schema/projects.schema');
 const projectsDao = require('../dao/projects.dao');
+const { async } = require('q');
+const { func } = require('joi');
 
 async function connection() {
     try {
@@ -110,9 +112,43 @@ function addProjectDetails(req, res) {
     });
 }
 
+
+async function signUp(req, res) {
+    const { email, password } = req.body;
+
+    try {
+        const result = await projectsService.signup(email, password);
+        res.status(result.statusCode).send(result);
+    } catch (err) {
+        console.error('Error in signup controller', err);
+        res.status(500).send({
+            message: 'Something went wrong!',
+            error: true
+        });
+    }
+}
+
+async function signing(req, res) {
+    const { email, password } = req.body;
+
+    try {
+        const result = await projectsService.signing(email, password);
+        res.status(result.statusCode).send(result);
+    } catch (err) {
+        console.error('Error in signing controller', err);
+        res.status(500).send({
+            message: 'Something went wrong!',
+            error: true
+        });
+    }
+}
+
+
 module.exports = {
     addProjectDetails,
     getAllProjectDetails,
     updateProjectDetails,
-    deleteProjectDetails
+    deleteProjectDetails,
+    signUp,
+    signing
 }

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
-
+const { async } = require('q');
 // Initialize Supabase client using environment variables
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
@@ -128,10 +128,71 @@ async function checkDatabaseConnection() {
     }
 }
 
+async function signUp(email, password) {
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            console.error('Error signing up:', error.message);
+            return { success: false, error: error.message };
+        }
+
+        console.log('Sign up successful:', data);
+        return { success: true, data: data };
+    } catch (err) {
+        console.error('Unexpected error during sign up:', err);
+        return { success: false, error: 'Unexpected error' };
+    }
+}
+
+async function signing(params) {
+    try {
+        const { email, password } = params;
+        
+        const { user, session, error } = await supabase.auth.signIn({
+            email,
+            password,
+        });
+
+        if (error) {
+            console.error('Error signing in:', error.message);
+            return {
+                message: 'Sign in failed',
+                error: true,
+                errorMessage: error.message,
+                statusCode: 400,
+            };
+        }
+
+        console.log('Sign in successful:', user);
+        return {
+            message: 'Sign in successful',
+            error: false,
+            statusCode: 200,
+            result: { user, session },
+        };
+    } catch (err) {
+        console.error('Error in signing function:', err);
+        return {
+            message: 'Something went wrong!',
+            error: true,
+            statusCode: 500,
+        };
+    }
+}
+
+
+
+
 module.exports = {
     addProjectDetails,
     getAllProjectDetails,
     updateProjectDetails,
     deleteProjectDetails,
+    signUp,
+    signing,
     checkDatabaseConnection
 };

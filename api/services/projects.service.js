@@ -1,4 +1,6 @@
 const projectsDao = require('../dao/projects.dao');
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 /**
  * @description: POST add project details.
@@ -136,6 +138,75 @@ exports.deleteProjectDetails = async function (projectId) {
             message: 'Something went wrong!',
             error: true,
             statusCode: 500
+        };
+    }
+};
+
+
+
+exports.signup = async function (email, password) {
+    try {
+        const { user, session, error } = await supabase.auth.signUp({
+            email,
+            password,
+        });
+
+        if (error) {
+            return {
+                message: 'An error occurred while signing up',
+                error: true,
+                errorMessage: error.message,
+                statusCode: 400
+            };
+        } else {
+            return {
+                message: 'User signed up successfully',
+                error: false,
+                statusCode: 200,
+                result: { user, session }
+            };
+        }
+    } catch (err) {
+        console.error('Error in signup service', err);
+        return {
+            message: 'Something went wrong!',
+            error: true,
+            statusCode: 500
+        };
+    }
+};
+
+exports.signing = async function (email, password) {
+    try {
+        const { user, session, error } = await supabase.auth.signIn({
+            email,
+            password,
+           
+        });
+
+        if (error) {
+            console.error('Error signing in:', error.message);
+            return {
+                message: 'Sign in failed',
+                error: true,
+                errorMessage: error.message,
+                statusCode: 400,
+            };
+        }
+
+        console.log('Sign in successful:', user);
+        return {
+            message: 'Sign in successful',
+            error: false,
+            statusCode: 200,
+            result: { user, session },
+        };
+    } catch (err) {
+        console.error('Error in signing service', err);
+        return {
+            message: 'Something went wrong!',
+            error: true,
+            statusCode: 500,
         };
     }
 };
