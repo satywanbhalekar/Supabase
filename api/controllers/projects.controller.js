@@ -1,8 +1,7 @@
 const projectsService = require('../services/projects.service');
 const { addProjectSchema, updateProjectSchema } = require('../schema/projects.schema');
 const projectsDao = require('../dao/projects.dao');
-const { async } = require('q');
-const { func } = require('joi');
+
 
 async function connection() {
     try {
