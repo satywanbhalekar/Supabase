@@ -10,6 +10,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANO
 exports.addProjectDetails = async function (body) {
     try {
         const result = await projectsDao.addProjectDetails(body);
+        console.log("Inside addProjectDetails service");
         console.log(result);
 
         if (result.error) {
