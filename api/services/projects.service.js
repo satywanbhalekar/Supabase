@@ -247,3 +247,7 @@ exports.resetPassword = async function(params) {
         };
     }
 };
+
+exports.signOut = async function() {
+    return await projectsDao.signOut();
+};

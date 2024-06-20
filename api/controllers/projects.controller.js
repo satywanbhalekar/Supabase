@@ -142,7 +142,7 @@ async function signing(req, res) {
     }
 }
 
-async function resetPasswordController(req, res) {
+async function resetPassword(req, res) {
     const { email } = req.body;
 
     try {
@@ -157,6 +157,20 @@ async function resetPasswordController(req, res) {
     }
 }
 
+
+async function signOut(req, res) {
+    try {
+        const result = await projectsService.signOut();
+        res.status(result.statusCode).send(result);
+    } catch (err) {
+        console.error('Error in signOut controller:', err);
+        res.status(500).send({
+            message: 'Something went wrong!',
+            error: true
+        });
+    }
+}
+
 module.exports = {
     addProjectDetails,
     getAllProjectDetails,
@@ -164,5 +178,6 @@ module.exports = {
     deleteProjectDetails,
     signUp,
     signing,
-    resetPasswordController
+    resetPassword,
+    signOut
 }

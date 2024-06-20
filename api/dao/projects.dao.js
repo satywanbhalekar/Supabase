@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
+const { async } = require('q');
 // Initialize Supabase client using environment variables
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
@@ -136,14 +137,14 @@ async function signUp(email, password) {
 
         if (error) {
             console.error('Error signing up:', error.message);
-            return { success: false, error: error.message };
+            return error;
         }
 
         console.log('Sign up successful:', data);
-        return { success: true, data: data };
+        return { data };
     } catch (err) {
         console.error('Unexpected error during sign up:', err);
-        return { success: false, error: 'Unexpected error' };
+        return { err };
     }
 }
 
@@ -158,28 +159,14 @@ async function signing(params) {
 
         if (error) {
             console.error('Error signing in:', error.message);
-            return {
-                message: 'Sign in failed',
-                error: true,
-                errorMessage: error.message,
-                statusCode: 400,
-            };
+            return {error };
         }
 
         console.log('Sign in successful:', user);
-        return {
-            message: 'Sign in successful',
-            error: false,
-            statusCode: 200,
-            result: { user, session },
-        };
+        return {user};
     } catch (err) {
         console.error('Error in signing function:', err);
-        return {
-            message: 'Something went wrong!',
-            error: true,
-            statusCode: 500,
-        };
+        return {err};
     }
 }
 
@@ -191,12 +178,7 @@ async function sendResetPasswordEmail(email) {
 
         if (error) {
             console.error('Error sending password reset email:', error.message);
-            return {
-                message: 'An error occurred while sending the password reset email',
-                error: true,
-                errorMessage: error.message,
-                statusCode: 400,
-            };
+            return {error };
         }
 
         return {
@@ -206,11 +188,7 @@ async function sendResetPasswordEmail(email) {
         };
     } catch (err) {
         console.error('Error in sendResetPasswordEmail function:', err);
-        return {
-            message: 'Something went wrong!',
-            error: true,
-            statusCode: 500,
-        };
+        return {err};
     }
 }
 
@@ -263,6 +241,35 @@ async function resetPassword(params) {
 
 
 
+async function signOut(params)  {
+    try {
+        const { error } = await supabase.auth.signOut();
+
+        if (error) {
+            console.error('Error signing out:', error.message);
+            return {
+                message: 'An error occurred while signing out',
+                error: true,
+                errorMessage: error.message,
+                statusCode: 400
+            };
+        }
+
+        return {
+            message: 'Signed out successfully',
+            error: false,
+            statusCode: 200
+        };
+    } catch (err) {
+        console.error('Error in signOut DAO:', err);
+        return {
+            message: 'Something went wrong!',
+            error: true,
+            statusCode: 500
+        };
+    }
+};
+
 module.exports = {
     addProjectDetails,
     getAllProjectDetails,
@@ -271,5 +278,6 @@ module.exports = {
     signUp,
     signing,
     resetPassword,
+    signOut,
     checkDatabaseConnection
 };
