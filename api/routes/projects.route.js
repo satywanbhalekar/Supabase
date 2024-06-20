@@ -8,5 +8,5 @@ projectsRoute.put('/updateProjectDetails/:projectId', projectsController.updateP
 projectsRoute.delete('/deleteProjectDetails/:projectId', projectsController.deleteProjectDetails);
 projectsRoute.post('/signUp', projectsController.signUp);
 projectsRoute.post('/signing', projectsController.signing);
-
+projectsRoute.post('/resetPassword', projectsController.resetPasswordController);
 module.exports = projectsRoute;

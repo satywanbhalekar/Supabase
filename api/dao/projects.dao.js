@@ -183,6 +183,83 @@ async function signing(params) {
     }
 }
 
+async function sendResetPasswordEmail(email) {
+    try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: 'http://example.com/account/update-password',
+        });
+
+        if (error) {
+            console.error('Error sending password reset email:', error.message);
+            return {
+                message: 'An error occurred while sending the password reset email',
+                error: true,
+                errorMessage: error.message,
+                statusCode: 400,
+            };
+        }
+
+        return {
+            message: 'Password reset email sent successfully',
+            error: false,
+            statusCode: 200,
+        };
+    } catch (err) {
+        console.error('Error in sendResetPasswordEmail function:', err);
+        return {
+            message: 'Something went wrong!',
+            error: true,
+            statusCode: 500,
+        };
+    }
+}
+
+async function updatePassword(newPassword) {
+    try {
+        const { user, error } = await supabase.auth.updateUser({
+            password: newPassword,
+        });
+
+        if (error) {
+            console.error('Error updating password:', error.message);
+            return {
+                message: 'An error occurred while updating the password',
+                error: true,
+                errorMessage: error.message,
+                statusCode: 400,
+            };
+        }
+
+        return {
+            message: 'Password updated successfully',
+            error: false,
+            statusCode: 200,
+            user,
+        };
+    } catch (err) {
+        console.error('Error in updatePassword function:', err);
+        return {
+            message: 'Something went wrong!',
+            error: true,
+            statusCode: 500,
+        };
+    }
+}
+
+async function resetPassword(params) {
+    const { email, newPassword } = params;
+
+    // Send reset password email
+    const resetEmailResponse = await sendResetPasswordEmail(email);
+    if (resetEmailResponse.error) {
+        return resetEmailResponse;
+    }
+
+    // Update the password (this should be done after the user clicks the link in the email)
+    // In a real scenario, you would capture the new password via a form and then call this function.
+    const updatePasswordResponse = await updatePassword(newPassword);
+    return updatePasswordResponse;
+}
 
 
 
@@ -193,5 +270,6 @@ module.exports = {
     deleteProjectDetails,
     signUp,
     signing,
+    resetPassword,
     checkDatabaseConnection
 };

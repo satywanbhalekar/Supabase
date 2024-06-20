@@ -142,6 +142,20 @@ async function signing(req, res) {
     }
 }
 
+async function resetPasswordController(req, res) {
+    const { email } = req.body;
+
+    try {
+        const result = await projectsService.resetPassword({ email });
+        res.status(result.statusCode).send(result);
+    } catch (err) {
+        console.error('Error in resetPasswordController:', err);
+        res.status(500).send({
+            message: 'Something went wrong!',
+            error: true,
+        });
+    }
+}
 
 module.exports = {
     addProjectDetails,
@@ -149,5 +163,6 @@ module.exports = {
     updateProjectDetails,
     deleteProjectDetails,
     signUp,
-    signing
+    signing,
+    resetPasswordController
 }

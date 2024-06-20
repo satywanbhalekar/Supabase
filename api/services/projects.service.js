@@ -211,3 +211,39 @@ exports.signing = async function (email, password) {
         };
     }
 };
+
+
+
+exports.resetPassword = async function(params) {
+    const { email } = params;
+
+    try {
+        // Send reset password email
+        const { error: resetError } = await supabase.auth.api.resetPasswordForEmail(email, {
+            redirectTo: 'http://example.com/account/update-password', // Replace with your actual redirect URL
+        });
+
+        if (resetError) {
+            console.error('Error sending password reset email:', resetError.message);
+            return {
+                message: 'An error occurred while sending the password reset email',
+                error: true,
+                errorMessage: resetError.message,
+                statusCode: 400,
+            };
+        }
+
+        return {
+            message: 'Password reset email sent successfully',
+            error: false,
+            statusCode: 200,
+        };
+    } catch (err) {
+        console.error('Error in resetPassword service:', err);
+        return {
+            message: 'Something went wrong!',
+            error: true,
+            statusCode: 500,
+        };
+    }
+};
