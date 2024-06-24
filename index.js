@@ -17,6 +17,10 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
+app.all('*', (req, res) => {
+  res.status(404).send('<h1>404! Page not found</h1>');
+});
+
 // Start server
 const port = process.env.PORT || 3000; // Default port 3000 if not specified
 const server = app.listen(port, () => {
